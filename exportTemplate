@@ -1,0 +1,25 @@
+public void exportTemplate(HttpServletResponse response) throws GlobalException {
+        try {
+            // 取得输出流
+            OutputStream out = response.getOutputStream();
+            String fileName = "提现信息导入模板.xlsx";
+            fileName = URLEncoder.encode(fileName, "UTF-8");
+            response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+            response.setHeader("content-disposition", "attachment;filename=" + fileName);
+            InputStream in = retrievetemplate.getInputStream();
+            byte[] b = new byte[1024];
+            int len = 0;
+            try {
+                while ((len = in.read(b)) > 0) {
+                    out.write(b, 0, len);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            out.close();
+            //强行将响应缓存中的内容发送到目的地
+            response.flushBuffer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
