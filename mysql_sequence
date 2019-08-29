@@ -4,9 +4,22 @@ begin
 	select current_val into value  from sequence where seq_name = v_seq_name;
    return value;
 end
-
-
 begin
     update sequence set current_val = current_val + increment_val  where seq_name = v_seq_name;
 	return currval(v_seq_name);
 end
+
+
+
+
+
+
+CREATE FUNCTION NEXT_VAL(sequence_name VARCHAR(64)) 
+RETURNS BIGINT 
+BEGIN
+    UPDATE TBL_SEQUENCE_1 t, 
+(SELECT @current_val:=`value` FROM TBL_SEQUENCE_1 t2 WHERE t2.sequence_name=sequence_name) t3 
+SET t.value = t.value + 1 
+WHERE t.sequence_name =sequence_name AND @current_val=t.value;
+    RETURN @current_val+1;
+END
