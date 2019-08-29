@@ -14,11 +14,11 @@ end
 
 
 
-CREATE FUNCTION NEXT_VAL(seq_name VARCHAR(64)) 
+CREATE FUNCTION nextval(seq_name VARCHAR(64)) 
 RETURNS BIGINT 
 BEGIN
-UPDATE sequence t,(SELECT @current_val:=current_val FROM sequence t2 WHERE t2.seq_name=seq_name) t3 
-SET t.current_val = t.current_val + increment_val
+UPDATE sequence t,(SELECT @current_val:=current_val,@increment_val:=increment_val FROM sequence t2 WHERE t2.seq_name=seq_name) t3 
+SET t.current_val = t.current_val + t.increment_val
 WHERE t.seq_name =seq_name AND @current_val=t.current_val;
-RETURN @current_val+increment_val;
+RETURN @current_val+@increment_val;
 END
