@@ -1,0 +1,51 @@
+Map<String,List<Integer>> changeCellStyle = new HashMap<String,List<Integer>>(){{
+        put("General",Lists.newArrayList(22,23));
+        put("@",Lists.newArrayList(24));
+    }};
+        this.exportExcept(changeCellStyle,null,null,fileName,page,OutputSupplierReportVO.class,response);
+    private void exportExcept(Map<String,List<Integer>> changeCellStyle,String title, String sheetName, String fileName, List<?> list, Class<?> pojoClass, HttpServletResponse response){
+        try {
+            ExportParams exportParams = new ExportParams(null, null, ExcelType.HSSF);
+            Workbook workbook = ExcelExportUtil.exportExcel(exportParams, pojoClass, list);
+            //获取到你这个Excel的长和宽
+            Sheet sheet = workbook.getSheetAt(0);
+            Row row = sheet.getRow(0);
+            int rowNum = sheet.getLastRowNum();
+            int colNum = row.getPhysicalNumberOfCells();
+
+            Map<Integer,Short> styleMap = Maps.newHashMap();
+            for (String key : changeCellStyle.keySet()) {
+                List<Integer> ints = changeCellStyle.getOrDefault(key,Lists.newArrayList());
+                for (Integer js: ints){
+                    styleMap.put(js,(short) BuiltinFormats.getBuiltinFormat(key));
+                }
+            }
+            HSSFCellStyle style = (HSSFCellStyle) workbook.createCellStyle();
+//            style.setDataFormat((short) BuiltinFormats.getBuiltinFormat("General"));
+            //效率非常低的二次循环遍历
+            for (int i = 1; i <= rowNum; i++) {
+                row = sheet.getRow(i);
+                int j = 0;
+                while (j < colNum) {
+                    Cell cell = row.getCell((short) j);
+//                    if(j==22||j==23||j==24){
+//                        cell.setCellStyle(style);
+//                    }
+                    if (styleMap.containsKey(j)) {
+                        style.setDataFormat(styleMap.get(j));
+                        cell.setCellStyle(style);
+                    }
+                    j++;
+                }
+            }
+            if (workbook != null) {
+                fileName = URLEncoder.encode(fileName+".xls", "UTF-8");
+                response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+                response.setHeader("Content-disposition", "attachment; filename=" + fileName);
+                response.setHeader("Pragma", "No-cache");
+                ExcelUtil.writeToOs(workbook, response);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
