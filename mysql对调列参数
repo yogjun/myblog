@@ -1,0 +1,1 @@
+update table as a, table as b set a.param1=b.param2, a.param2=b.param1 where a.id=b.id;
