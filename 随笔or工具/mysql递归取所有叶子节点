@@ -1,0 +1,7 @@
+ select * from 
+(
+select t1.CardCode,t1.parent_code,t1.U_CustType,if(find_in_set(parent_code, @pids) > 0, @pids := concat(@pids, ',', CardCode), NULL) as ischild 
+from (select CardCode,parent_code,U_CustType from `user` t) t1,(select @pids := 'FW000164') t2
+) t3 
+where ischild IS NOT NULL;
+
