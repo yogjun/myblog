@@ -21,14 +21,12 @@ public class KMP {
         dp[i][j] = dp[x][j];
       }
       dp[i][pat.charAt(i)] = i + 1;
+      // x的含义就是对应的最大重复串的位置
       x = dp[x][pat.charAt(i)];
-      System.out.println(x);
     }
   }
 
   public static void main(String[] args) {
-//    int i = "0".charAt(0);
-//    System.out.println(i);
-    new KMP("ABABC");
+    new KMP("ABCABCD");
   }
 }
